@@ -1,0 +1,15 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.2
+Flask-SocketIO==5.3.6
+Werkzeug==2.3.7
+openai==0.28.0
+python-dotenv==1.0.0
+
+#FLASK + SQL:
+#https://flask-sqlalchemy.readthedocs.io/en/stable/
+##https://www.sqlalchemy.org/
+
+#FLASK LOGIN: https://flask-login.readthedocs.io/en/latest/
+
+#bcrypt encriptar senhas do BD:https://github.com/pyca/bcrypt
