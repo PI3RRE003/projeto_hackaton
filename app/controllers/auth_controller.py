@@ -35,6 +35,6 @@ def login_api():
     if user and user.check_password(password):
         login_user(user)
         tipo = "profissional" if isinstance(user, Profissional) else "paciente"
-        return jsonify({"message":"Login realizado com sucesso", "user_id": user.id, "tipo": tipo}), 200
+        return jsonify({"success": True,"message":"Login realizado com sucesso", "user_id": user.id, "tipo": tipo}), 200
     else:
         return jsonify({"error": "Credenciais inválidas"}), 401

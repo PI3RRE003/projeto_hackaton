@@ -1,12 +1,14 @@
 from flask import Flask
+from flask_cors import CORS
 from app.config import Config
 from app.extensions import db, login_manager, socketio
 from app.controllers import auth_controller, paciente_controller, profissional_controller, chat_controller
-import click
 from flask.cli import with_appcontext
+import click
 
 def create_app():
     app = Flask(__name__)  
+    CORS(app)  
     app.config.from_object(Config)
     
     # Inicializar extensões

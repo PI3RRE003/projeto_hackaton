@@ -1,15 +1,13 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_manager
 from flask_socketio import emit, join_room
-from app.extensions import db, socketio
-from app.models import MensagemChat, Paciente, Profissional
-from app.services.gpt_service import GPTService
+from app.services.gemini_service import GeminiService
 from app.utils.decorators import paciente_required, profissional_required
 from datetime import date
 
-
 bp = Blueprint('chat', __name__)
-gpt_service = GPTService()
+gemini_service = GeminiService()
+'''
 
 @bp.route('/chat')
 @login_required
@@ -146,39 +144,36 @@ def chat_status():
         'limite': 3,
         'pode_enviar': pode_enviar
     })
+'''
 
-# Chat API sem depender de sessão/cookies
 @bp.route('/api/chat', methods=['POST'])
 def chat_post():
-    data = request.get_json()
-    mensagem = data.get('mensagem')
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Nenhum dado enviado no corpo da requisição"}), 400
 
-    if not data:
-        return jsonify({"error": "Nenhum dado enviado"}), 400
+        message = data.get('message', '').strip()
+        if not message:
+            return jsonify({"error": "O campo 'message' é obrigatório e não pode estar vazio"}), 400
 
-    user_id = data.get("user_id")
-    tipo = data.get("tipo")
-    mensagem = data.get("message", "").strip()
+        # Integra com GPTService
+        try:
+            from app.services.gemini_service import GeminiService
+            gpt_service = GeminiService()
+            resposta_gpt = gpt_service.gerar_resposta(message)
+            return jsonify({
+                "status": "success",
+                "direcionamento": resposta_gpt
+            }), 200
+        except Exception as e:
+            return jsonify({"error": f"Erro ao processar a mensagem com GPTService: {str(e)}"}), 500
 
-    if not user_id or not tipo or not mensagem:
-        return jsonify({"error": "user_id, tipo e message são obrigatórios"}), 400
-
-    # Valida usuário
-    if tipo == "profissional":
-        user = Profissional.query.get(user_id)
-    else:
-        user = Paciente.query.get(user_id)
-
-    if not user:
-        return jsonify({"error": "Usuário não encontrado"}), 404
-
-    # Aqui você integra com GPTService
-    from app.services.gpt_service import GPTService
-    gpt_service = GPTService()
-    resposta_gpt = gpt_service.gerar_resposta(mensagem)
-
-    # Retorna direto a resposta
+    except Exception as e:
+        return jsonify({"error": f"Erro interno no servidor: {str(e)}"}), 500    # Retorna direto a resposta
+    '''
     return jsonify({
         "user_message": mensagem,
         "assistant_response": resposta_gpt
     }), 200
+    '''

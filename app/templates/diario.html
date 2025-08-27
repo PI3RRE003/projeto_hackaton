@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Jornada - Evolve</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+        }
+
+        .main-header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: #6a82fb;
+        }
+
+        .logout-button {
+            background-color: transparent;
+            color: #6a82fb;
+            border: 1px solid #6a82fb;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #6a82fb;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .journal-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .journal-card h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        #currentDate {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #777;
+            font-style: italic;
+        }
+
+        .journal-entry {
+            margin-bottom: 30px;
+        }
+
+        .journal-entry h3 {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .journal-textarea {
+            width: 100%;
+            min-height: 150px;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.6em;
+            background-image: linear-gradient(to bottom, #eee 1px, transparent 1px);
+            background-size: 100% 1.6em;
+            background-color: #fdfdfd;
+            border-left: 2px solid #ffb3b3;
+            padding-left: 15px;
+            resize: vertical;
+        }
+
+        .journal-textarea:focus {
+            outline: none;
+        }
+
+        .save-button {
+            background-color: #34d1bf;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .save-button:hover:not(:disabled) {
+            background-color: #2bafa0;
+        }
+
+        .save-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .feedback-message {
+            color: #2bafa0;
+            font-weight: 700;
+            margin-top: 10px;
+            height: 20px;
+        }
+
+        .feedback-message.error {
+            color: #d13434;
+        }
+
+        .dialog-box {
+            background-color: #eaf7f6;
+            border-left: 4px solid #34d1bf;
+            padding: 15px 20px;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .dialog-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dialog-box p {
+            margin: 0;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .dialog-box strong {
+            color: #2bafa0;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1 class="logo">Evolve - Seu espaço pessoal</h1>
+            <button id="logoutButton" class="logout-button">Sair</button>
+        </div>
+    </header>
+    <main class="container">
+        <div class="journal-card">
+            <h2>Minha Jornada de Hoje</h2>
+            <p id="currentDate">Carregando data...</p>
+            <div class="journal-entry" id="entryManha">
+                <h3>☀️ Manhã</h3>
+                <textarea class="journal-textarea" placeholder="Como você está se sentindo hoje?"></textarea>
+                <button class="save-button">Salvar Relato</button>
+                <p class="feedback-message"></p>
+                <div class="dialog-box-container"></div>
+            </div>
+            <div class="journal-entry" id="entryTarde">
+                <h3>☀️ Tarde</h3>
+                <textarea class="journal-textarea" placeholder="O que aconteceu durante a sua tarde?"></textarea>
+                <button class="save-button">Salvar Relato</button>
+                <p class="feedback-message"></p>
+                <div class="dialog-box-container"></div>
+            </div>
+            <div class="journal-entry" id="entryNoite">
+                <h3>🌙 Noite</h3>
+                <textarea class="journal-textarea" placeholder="Como você está terminando o seu dia?"></textarea>
+                <button class="save-button">Salvar Relato</button>
+                <p class="feedback-message"></p>
+                <div class="dialog-box-container"></div>
+            </div>
+        </div>
+    </main>
+    <script>
+        // Função para realizar requisições HTTP
+        async function fazerRequisicao(url, dados) {
+            try {
+                console.log(`Enviando para ${url}:`, dados);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dados)
+                });
+                console.log(`Status da resposta para ${url}:`, response.status);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(`Erro na API: ${response.status} - ${errorData.error || response.statusText}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Falha ao comunicar com ${url}:`, error.message, error.stack);
+                throw error;
+            }
+        }
+
+        // Função para obter direcionamento da IA
+        async function obterDirecionamentoDaIA(texto) {
+            try {
+                const dados = { message: texto };
+                const resposta = await fazerRequisicao('http://127.0.0.1:5000/api/chat', dados);
+                return resposta.direcionamento || 'Resposta recebida, mas sem direcionamento.';
+            } catch (error) {
+                return `Erro ao obter direcionamento: ${error.message}`;
+            }
+        }
+
+        // Função para atualizar a data e hora
+        function atualizarHorario() {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dataFormatada = now.toLocaleString('pt-BR', optionsDate);
+            const horaFormatada = now.toLocaleTimeString('pt-BR');
+            dateElement.textContent = `${dataFormatada} | ${horaFormatada}`;
+        }
+
+        // Função para exibir mensagem de feedback
+        function mostrarFeedback(container, mensagem, isErro = false) {
+            const feedback = container.querySelector('.feedback-message');
+            feedback.textContent = mensagem;
+            feedback.className = `feedback-message ${isErro ? 'error' : ''}`;
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback-message';
+            }, 3000);
+        }
+
+        // Função para criar e exibir caixa de diálogo
+        function mostrarDialogo(container, mensagem) {
+            container.innerHTML = '';
+            const dialogBox = document.createElement('div');
+            dialogBox.classList.add('dialog-box');
+            dialogBox.innerHTML = `<p><strong>Uma mensagem para você:</strong> ${mensagem}</p>`;
+            container.appendChild(dialogBox);
+            setTimeout(() => dialogBox.classList.add('visible'), 10);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Página carregada!');
+
+            // Atualizar data e hora
+            atualizarHorario();
+            setInterval(atualizarHorario, 1000);
+
+            // Botão de logout
+            const logoutButton = document.getElementById('logoutButton');
+            logoutButton.addEventListener('click', () => {
+                console.log('Logout clicado');
+                window.location.href = 'index.html';
+            });
+
+            // Configurar botões de salvar
+            const saveButtons = document.querySelectorAll('.save-button');
+            saveButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const parentEntry = button.closest('.journal-entry');
+                    const textarea = parentEntry.querySelector('.journal-textarea');
+                    const dialogContainer = parentEntry.querySelector('.dialog-box-container');
+                    const relato = textarea.value.trim();
+
+                    if (!relato) {
+                        mostrarFeedback(parentEntry, 'Por favor, escreva seu relato antes de salvar.', true);
+                        return;
+                    }
+
+                    button.disabled = true;
+                    button.textContent = 'Analisando...';
+
+                    try {
+                        const respostaInteligente = await obterDirecionamentoDaIA(relato);
+                        mostrarDialogo(dialogContainer, respostaInteligente);
+                        mostrarFeedback(parentEntry, 'Relato salvo com sucesso!');
+                        textarea.disabled = true;
+                        button.textContent = 'Salvo!';
+                    } catch (error) {
+                        mostrarFeedback(parentEntry, `Erro: ${error.message}`, true);
+                        button.disabled = false;
+                        button.textContent = 'Salvar Relato';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

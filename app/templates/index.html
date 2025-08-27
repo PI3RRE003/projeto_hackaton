@@ -1,0 +1,186 @@
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Evolve</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ---- Reset Básico e Configurações Globais ---- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Define a fonte para toda a página, importada do Google Fonts */
+            font-family: 'Nunito', sans-serif;
+            /* Cria o background com um gradiente suave */
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            /* Configuração para centralizar o conteúdo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* Ocupa 100% da altura da tela */
+        }
+
+        /* ---- Container Principal do Formulário ---- */
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            /* Bordas arredondadas */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            /* Sombra para dar profundidade */
+            width: 100%;
+            max-width: 400px;
+            /* Largura máxima do formulário */
+            text-align: center;
+            /* Centraliza o texto dentro do container */
+        }
+
+        .login-form h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .login-form p {
+            margin-bottom: 20px;
+            color: #777;
+        }
+
+        /* ---- Estilização dos Grupos de Input (Label + Campo) ---- */
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+            /* Alinha o texto dos labels à esquerda */
+        }
+
+        .input-group label {
+            display: block;
+            /* Faz o label ocupar uma linha inteira */
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 700;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            /* Efeito visual quando o campo está selecionado */
+            outline: none;
+            border-color: #74ebd5;
+        }
+
+        /* ---- Estilização do Botão ---- */
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #6a82fb;
+            /* Cor principal do botão */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            /* Muda o cursor para uma mãozinha */
+            transition: background-color 0.3s ease;
+            /* Transição suave da cor */
+        }
+
+        button:hover {
+            /* Cor do botão quando o mouse passa por cima */
+            background-color: #5870e2;
+        }
+
+        /* ---- Links Adicionais ---- */
+        .links {
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #6a82fb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <form class="login-form" id="loginForm">
+            <h1>Evolve</h1>
+            <p>Bem vindo ao seu lugar!</p>
+            <div class="input-group"> <label for="username">Username</label> <input type="text" id="username"
+                    name="username" placeholder="Digite seu usuario" required> </div>
+            <div class="input-group"> <label for="password">Senha</label> <input type="password" id="password"
+                    name="password" placeholder="Digite sua senha" required> </div> <button type="submit"
+                id="loginButton" class="btn">Entrar</button>
+            <div class="links"> <a href="#">Esqueceu sua senha?</a> </div>
+        </form>
+    </div>
+</body>
+<script>
+
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.querySelector('button[type="submit"]');
+
+    loginForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        console.log("Formulário enviado!"); // Depuração
+        loginButton.disabled = true; // Desativa o botão
+        loginButton.textContent = "Carregando..."; // Feedback visual
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch("http://127.0.0.1:5000/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            console.log("Status da resposta:", response.status); // Depuração
+            if (!response.ok) {
+                throw new Error(`Erro na requisição: ${response.status} - ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("Resposta completa do backend:", data); // Depuração
+
+            if (data.status === "success") { // Redirecionamento
+                console.log("Falha na autenticação:", data.message);
+                alert(data.message || "Username ou senha inválidos!");
+            } else {
+                console.log("Condição de sucesso atendida, redirecionando...");
+                alert("Login realizado com sucesso!");
+                window.location.href = './diario.html';
+            }
+        } catch (error) {
+            console.error("Erro no login:", error.message, error.stack);
+            alert(`Erro ao tentar fazer login: ${error.message}`);
+        } finally {
+            loginButton.disabled = false; // Reativa o botão
+            loginButton.textContent = "Entrar"; // Restaura o texto
+        }
+    });
+</script>

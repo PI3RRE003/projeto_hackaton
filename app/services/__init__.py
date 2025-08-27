@@ -1,7 +1,5 @@
-from app.services.diario_service import DiarioService
-from app.services.gpt_service import GPTService
+from app.services.gemini_service import GeminiService
 
 __all__ = [
-    'DiarioService',
-    'GPTService'
+    'GeminiService'
 ]

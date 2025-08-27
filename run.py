@@ -154,11 +154,7 @@ load_dotenv()
 
 # Importações dos componentes da sua aplicação Flask
 # É uma boa prática agrupar as importações da aplicação
-from app.app import create_app
-from app.extensions import db, socketio
-from app.models.paciente import Paciente 
-from app.models.profissional import Profissional 
-from app.models.chat import MensagemChat
+
 
 # Obtém a chave da API da OpenAI das variáveis de ambiente
 # Embora não seja usada neste script, é uma boa prática mantê-la aqui se for usada em outro lugar

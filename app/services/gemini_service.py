@@ -1,17 +1,12 @@
-import openai
 from google import genai
-from flask import jsonify
-
 from app.config import Config
 
-class GPTService:
+class GeminiService:
     def __init__(self):        
         client = genai.Client(api_key=Config.GEMINIAI_API_KEY)
         self.client = client
     def gerar_resposta(self, mensagem, contexto=None):
-        """
-        Gera uma resposta usando a API do OpenAI GPT
-        """
+       
         try:
             # Contexto para o GPT (pode ser personalizado)
             prompt = f"""
@@ -31,7 +26,7 @@ class GPTService:
             return response.text
         
         except Exception as e:
-            print(f"Erro ao chamar API do GPT: {e}")
+            print(f"Erro ao chamar API: {e}")
             return "Desculpe, estou tendo dificuldades técnicas no momento. Por favor, tente novamente mais tarde ou entre em contato com seu profissional de saúde."
         
 
