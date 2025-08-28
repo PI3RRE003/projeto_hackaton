@@ -291,7 +291,7 @@
             container.innerHTML = '';
             const dialogBox = document.createElement('div');
             dialogBox.classList.add('dialog-box');
-            dialogBox.innerHTML = `<p><strong>Uma mensagem para você:</strong> ${mensagem}</p>`;
+            dialogBox.innerHTML = `<p><strong>Gerado por IA : Uma mensagem para você:</strong> ${mensagem}</p>`;
             container.appendChild(dialogBox);
             setTimeout(() => dialogBox.classList.add('visible'), 10);
         }
@@ -328,16 +328,26 @@
                         const respostaInteligente = await obterDirecionamentoDaIA(relato);
                         mostrarDialogo(dialogContainer, respostaInteligente);
                         mostrarFeedback(parentEntry, 'Relato salvo com sucesso!');
-                        textarea.disabled = true;
-                        button.textContent = 'Salvo!';
+                        // --- ALTERAÇÕES PARA TESTE ---
+                        // textarea.disabled = true; // Comentado para não bloquear a área de texto
 
-                        // 🔹 Salvar no localStorage
+                        // Reabilita o botão para novos envios
+                        button.disabled = false;
+                        button.textContent = 'Salvar Relato'; // Restaura o texto original do botão
+
+                        // Opcional: Comente a linha abaixo para não salvar localmente durante o teste
+                        // -----------------------------
                         salvarNoLocalStorage(periodo, relato, respostaInteligente);
                     } catch (error) {
                         mostrarFeedback(parentEntry, `Erro: ${error.message}`, true);
                         button.disabled = false;
                         button.textContent = 'Salvar Relato';
                     }
+                });
+
+                document.getElementById('logoutButton').addEventListener('click', () => {
+                    localStorage.removeItem(STORAGE_KEY); // Limpa os dados ao sair
+                    window.location.href = 'index.html';
                 });
             });
         });

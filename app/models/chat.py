@@ -22,4 +22,4 @@ class MensagemChat(db.Model):
     
     @classmethod
     def pode_enviar_mensagem(cls, paciente_id):
-        return cls.get_mensagens_hoje(paciente_id) < 10
+        return cls.get_mensagens_hoje(paciente_id) < 3

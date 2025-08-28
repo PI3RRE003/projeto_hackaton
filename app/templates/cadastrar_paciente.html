@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Paciente - Evolv Mind</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos Globais e do Cabeçalho (Reaproveitados do Painel) */
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: #f9fafb;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 15px 30px;
+            height: 70px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            /* Impede que o header encolha */
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: #4f46e5;
+            margin-left: 30px;
+        }
+
+        .back-button {
+            background-color: transparent;
+            color: #4f46e5;
+            border: 1px solid #4f46e5;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        /* Estilos do Formulário de Cadastro */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        .form-container h1 {
+            font-size: 1.8rem;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px #c7d2fe;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-button:hover {
+            background-color: #4338ca;
+        }
+
+        .submit-button:disabled {
+            background-color: #a5b4fc;
+            cursor: not-allowed;
+        }
+
+        .feedback-message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            /* Começa escondido */
+        }
+
+        .feedback-message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .feedback-message.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1 class="logo">Evolve Mind</h1>
+            <a href="profissional.html" class="back-button">Voltar ao Painel</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="form-container">
+            <h1>Cadastrar Novo Paciente</h1>
+            <!-- Em cadastrar-paciente.html -->
+
+            <form id="cadastro-form">
+                <div class="form-group">
+                    <!-- Mude o 'label', 'id' e 'name' para 'username' -->
+                    <label for="username">Nome de Usuário (Login)</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <!-- Mude o 'id' e 'name' para 'password' -->
+                    <label for="password">Senha Provisória</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <!-- Outros campos como data de nascimento e telefone podem ser removidos -->
+                <!-- se não fazem parte do modelo Paciente -->
+
+                <button type="submit" id="submit-button" class="submit-button">Cadastrar Paciente</button>
+            </form>
+            <div id="feedback-message" class="feedback-message"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('cadastro-form');
+            const submitButton = document.getElementById('submit-button');
+            const feedbackMessage = document.getElementById('feedback-message');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Impede o envio padrão do formulário
+
+                // Desabilitar o botão e mostrar feedback de carregamento
+                submitButton.disabled = true;
+                submitButton.textContent = 'Cadastrando...';
+                feedbackMessage.style.display = 'none';
+
+                // Coletar os dados do formulário
+                const formData = new FormData(form);
+                const dadosPaciente = Object.fromEntries(formData.entries());
+
+                // Validação simples
+                if (!dadosPaciente.nome || !dadosPaciente.email || !dadosPaciente.senha) {
+                    mostrarFeedback('Por favor, preencha os campos obrigatórios (Nome, Email, Senha).', 'error');
+                    return;
+                }
+
+                try {
+                    // Aqui você fará a chamada para a sua API
+                    // Certifique-se de que sua API espera um POST em '/api/pacientes'
+                    const response = await fetch('http://127.0.0.1:5000/api/criar_pacientes', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dadosPaciente),
+                        credentials: 'include'
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        // Se a resposta do servidor não for de sucesso (ex: erro 400, 500)
+                        throw new Error(result.error || 'Ocorreu um erro desconhecido.');
+                    }
+
+                    // Se a operação foi bem-sucedida
+                    mostrarFeedback('Paciente cadastrado com sucesso!', 'success');
+                    form.reset(); // Limpa o formulário
+
+                    // Redireciona para o painel após um breve momento
+                    setTimeout(() => {
+                        window.location.href = 'profissional.html';
+                    }, 2000);
+
+                } catch (error) {
+                    mostrarFeedback(`Erro ao cadastrar: ${error.message}`, 'error');
+                }
+            });
+
+            function mostrarFeedback(mensagem, tipo) {
+                feedbackMessage.textContent = mensagem;
+                feedbackMessage.className = `feedback-message ${tipo}`; // 'success' ou 'error'
+
+                // Reabilitar o botão em caso de erro
+                if (tipo === 'error') {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Cadastrar Paciente';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

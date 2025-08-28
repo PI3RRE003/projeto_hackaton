@@ -4,166 +4,15 @@ from app.extensions import db, socketio
 from app.models.paciente import Paciente 
 from app.models.profissional import Profissional 
 from app.models.chat import MensagemChat
+from datetime import datetime, timedelta
 import os
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
-
-
 app = create_app()
 
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-
-app = create_app()
-
-@app.cli.command("init-db")
-def init_db():
-    """Initialize the database."""
-    print("Removendo tabelas existentes...")
-    db.drop_all()  # CRÍTICO: Adicionar esta linha
-    print("Criando novas tabelas...")
-    db.create_all()
-    print("Database initialized successfully!")
-
-@app.cli.command("create-test-data")
-def create_test_data():
-    """Create test data."""
-    try:
-        print("Criando dados de teste...")
         
-        # Criar usuários de teste
-        paciente_user = Paciente(username='paciente')
-        paciente_user.set_password('senha123')
-        
-        profissional_user = Profissional(username='profissional')
-        profissional_user.set_password('senha123')
-        
-        db.session.add_all([paciente_user, profissional_user])
-        db.session.commit()
-        
-        print("Usuários criados...")
-        
-        # Criar paciente
-        paciente = Paciente(
-            username='João da Silva',
-            user_id=paciente_user.id
-        )
-        
-        # Criar profissional
-        profissional = Profissional(
-            username='Dra. Maria Santos',
-            user_id=profissional_user.id
-        )
-        
-        db.session.add(paciente)
-        db.session.add(profissional)
-        db.session.commit()
-        
-        print("Perfis criados...")
-        
-        # Criar algumas mensagens de exemplo
-        from datetime import datetime, timedelta
-        
-        mensagem1 = MensagemChat(
-            paciente_id=paciente.id,
-            mensagem="Estou me sentindo muito ansioso hoje.",
-            resposta="Entendo que deve ser difícil. Lembre-se de praticar a respiração profunda. Quer compartilhar mais sobre o que está sentindo?",
-            eh_do_paciente=True,
-            data=datetime.now().date()
-        )
-        
-        mensagem2 = MensagemChat(
-            paciente_id=paciente.id,
-            mensagem="Tive dificuldade para dormir esta noite.",
-            resposta="A insônia pode ser relacionada à ansiedade. Tente criar uma rotina relaxante antes de dormir. Conte mais para seu profissional na próxima consulta.",
-            eh_do_paciente=True,
-            data=datetime.now().date()
-        )
-        
-        db.session.add(mensagem1)
-        db.session.add(mensagem2)
-        db.session.commit()
-        
-        print("Mensagens criadas...")
-        print("Test data created successfully!")
-        print("\nDados criados:")
-        print("- Usuário paciente: paciente / senha123")
-        print("- Usuário profissional: profissional / senha123")
-        print("- Perfil paciente: João da Silva")
-        print("- Perfil profissional: Dra. Maria Santos")
-        print("- 2 mensagens de exemplo")
-        
-    except Exception as e:
-        db.session.rollback()
-        print(f"Erro ao criar dados de teste: {e}")
-        raise e
-
-@app.cli.command("reset-db")
-def reset_db():
-    """Reset database - drop all tables and recreate them."""
-    print("Resetando banco de dados...")
-    db.drop_all()
-    db.create_all()
-    print("Banco resetado! Execute 'flask create-test-data' para criar dados de teste.")
-
-if __name__ == '__main__':
-    socketio.run(app, debug=True)
-@app.cli.command("init-db")
-def init_db():
-    """Initialize the database."""
-    db.create_all()
-    print("Database initialized.")
-
-@app.cli.command("create-test-data")
-def create_test_data():
-    """Create test data."""
-    # Criar usuários de teste
-    paciente_user = Paciente(username='paciente')
-    paciente_user.set_password('senha123')
-    
-    profissional_user = Profissional(username='profissional')
-    profissional_user.set_password('senha123')
-    
-    db.session.add_all([paciente_user,profissional_user])
-    db.session.commit()
-    
-    # Criar paciente
-    paciente = Paciente(
-        username='João da Silva',
-        user_id=paciente_user.id
-    )
-    
-    # Criar profissional
-    profissional = Profissional(
-        username='Dra. Maria Santos',
-        user_id=profissional_user.id
-    )
-    
-    db.session.add(paciente)
-    db.session.add(profissional)
-    db.session.commit()# -*- coding: utf-8 -*-
-
-# Importações necessárias do sistema e bibliotecas
-import os
-from datetime import datetime
-from dotenv import load_dotenv
-
-# Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
-
-# Importações dos componentes da sua aplicação Flask
-# É uma boa prática agrupar as importações da aplicação
-
-
-# Obtém a chave da API da OpenAI das variáveis de ambiente
-# Embora não seja usada neste script, é uma boa prática mantê-la aqui se for usada em outro lugar
-api_key = os.getenv("OPENAI_API_KEY")
-
-# Cria a instância da aplicação Flask
-app = create_app()
-
-# --- Comandos para o CLI do Flask ---
+    # --- Comandos para o CLI do Flask ---
 # Estes comandos ajudam a gerenciar o banco de dados e a popular dados de teste.
 # Para usá-los, execute no terminal:
 # flask init-db
@@ -195,13 +44,13 @@ def create_test_data():
         
         # Criar um paciente de teste com nome e credenciais
         paciente = Paciente(
-            username='João da Silva'
+            username='PACIENTE'
         )
         paciente.set_password('senha123') # Define a senha de forma segura
         
         # Criar um profissional de teste com nome e credenciais
         profissional = Profissional(
-            username='Dra. Maria Santos'
+            username='PROFISSIONAL'
         )
         profissional.set_password('senha123') # Define a senha de forma segura
         

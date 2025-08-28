@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Evolve</title>
-    <link rel="stylesheet" href="login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
@@ -17,16 +16,12 @@
         }
 
         body {
-            /* Define a fonte para toda a página, importada do Google Fonts */
             font-family: 'Nunito', sans-serif;
-            /* Cria o background com um gradiente suave */
             background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-            /* Configuração para centralizar o conteúdo */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* Ocupa 100% da altura da tela */
         }
 
         /* ---- Container Principal do Formulário ---- */
@@ -34,14 +29,10 @@
             background-color: white;
             padding: 40px;
             border-radius: 10px;
-            /* Bordas arredondadas */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            /* Sombra para dar profundidade */
             width: 100%;
             max-width: 400px;
-            /* Largura máxima do formulário */
             text-align: center;
-            /* Centraliza o texto dentro do container */
         }
 
         .login-form h1 {
@@ -54,16 +45,42 @@
             color: #777;
         }
 
+        /* ---- Seletor de Tipo de Usuário ---- */
+        .user-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #d0e2f4;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .user-type-btn.active {
+            background-color: #6a82fb;
+            color: white;
+        }
+
+        .user-type-btn:not(.active):hover {
+            background-color: #e9ecef;
+        }
+
         /* ---- Estilização dos Grupos de Input (Label + Campo) ---- */
         .input-group {
             margin-bottom: 15px;
             text-align: left;
-            /* Alinha o texto dos labels à esquerda */
         }
 
         .input-group label {
             display: block;
-            /* Faz o label ocupar uma linha inteira */
             margin-bottom: 5px;
             color: #555;
             font-weight: 700;
@@ -78,7 +95,6 @@
         }
 
         .input-group input:focus {
-            /* Efeito visual quando o campo está selecionado */
             outline: none;
             border-color: #74ebd5;
         }
@@ -88,20 +104,16 @@
             width: 100%;
             padding: 15px;
             background-color: #6a82fb;
-            /* Cor principal do botão */
             color: white;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            /* Muda o cursor para uma mãozinha */
             transition: background-color 0.3s ease;
-            /* Transição suave da cor */
         }
 
         button:hover {
-            /* Cor do botão quando o mouse passa por cima */
             background-color: #5870e2;
         }
 
@@ -127,61 +139,97 @@
         <form class="login-form" id="loginForm">
             <h1>Evolve Mind</h1>
             <p>Bem vindo ao seu lugar!</p>
-            <div class="input-group"> <label for="username">Username</label> <input type="text" id="username"
-                    name="username" placeholder="Digite seu usuario" required> </div>
-            <div class="input-group"> <label for="password">Senha</label> <input type="password" id="password"
-                    name="password" placeholder="Digite sua senha" required> </div> <button type="submit"
-                id="loginButton" class="btn">Entrar</button>
-            <div class="links"> <a href="#">Esqueceu sua senha?</a> </div>
+
+            <!-- Seletor de tipo de usuário -->
+            <div class="user-type-selector">
+                <button type="button" class="user-type-btn active" data-user-type="paciente">Paciente</button>
+                <button type="button" class="user-type-btn" data-user-type="profissional">Profissional</button>
+            </div>
+            <input type="hidden" id="userType" name="userType" value="paciente">
+
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Digite seu usuario" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+            </div>
+            <button type="submit" id="loginButton" class="btn">Entrar</button>
+            <div class="links">
+                <a href="#">Esqueceu sua senha?</a>
+            </div>
         </form>
     </div>
-</body>
-<script>
 
-    const loginForm = document.getElementById('loginForm');
-    const loginButton = document.querySelector('button[type="submit"]');
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.querySelector('button[type="submit"]');
+        const userTypeButtons = document.querySelectorAll('.user-type-btn');
+        const userTypeInput = document.getElementById('userType');
 
-    loginForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        console.log("Formulário enviado!"); // Depuração
-        loginButton.disabled = true; // Desativa o botão
-        loginButton.textContent = "Carregando..."; // Feedback visual
+        // Configura o seletor de tipo de usuário
+        userTypeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Remove a classe active de todos os botões
+                userTypeButtons.forEach(btn => btn.classList.remove('active'));
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+                // Adiciona a classe active ao botão clicado
+                this.classList.add('active');
 
-        try {
-            const response = await fetch("http://127.0.0.1:5000/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ username, password }),
-                credentials: 'include'
+                // Atualiza o valor do campo hidden
+                userTypeInput.value = this.getAttribute('data-user-type');
             });
+        });
 
-            console.log("Status da resposta:", response.status); // Depuração
-            if (!response.ok) {
-                throw new Error(`Erro na requisição: ${response.status} - ${response.statusText}`);
+        loginForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            console.log("Formulário enviado!");
+            loginButton.disabled = true;
+            loginButton.textContent = "Carregando...";
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userType = userTypeInput.value;
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username, password, user_type: userType }),
+                    credentials: 'include'
+                });
+
+                console.log("Status da resposta:", response.status);
+
+                const data = await response.json();
+                console.log("Resposta completa do backend:", data);
+
+                if (response.ok && data.success) {
+                    console.log("Login realizado com sucesso!");
+                    alert("Login realizado com sucesso!");
+
+                    // Redireciona para página diferente conforme o tipo de usuário
+                    if (userType === 'paciente') {
+                        window.location.href = './diario.html';
+                    } else {
+                        window.location.href = './profissional.html';
+                    }
+                } else {
+                    console.log("Falha na autenticação:", data.error);
+                    alert(data.error || "Username ou senha inválidos!");
+                }
+            } catch (error) {
+                console.error("Erro no login:", error.message, error.stack);
+                alert(`Erro ao tentar fazer login: ${error.message}`);
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = "Entrar";
             }
+        });
+    </script>
+</body>
 
-            const data = await response.json();
-            console.log("Resposta completa do backend:", data); // Depuração
-
-            if (data.status === "success") { // Redirecionamento
-                console.log("Falha na autenticação:", data.message);
-                alert(data.message || "Username ou senha inválidos!");
-            } else {
-                console.log("Condição de sucesso atendida, redirecionando...");
-                alert("Login realizado com sucesso!");
-                window.location.href = './diario.html';
-            }
-        } catch (error) {
-            console.error("Erro no login:", error.message, error.stack);
-            alert(`Erro ao tentar fazer login: ${error.message}`);
-        } finally {
-            loginButton.disabled = false; // Reativa o botão
-            loginButton.textContent = "Entrar"; // Restaura o texto
-        }
-    });
-</script>
+</html>

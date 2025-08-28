@@ -14,7 +14,7 @@ class GeminiService:
             
             Mensagem do paciente: {mensagem}
             
-            Responda de forma acolhedora, oferecendo apoio e, se necessário, sugerindo
+            Responda de forma acolhedora em frases curtas, oferecendo apoio e, se necessário, sugerindo
             que o paciente compartilhe mais detalhes com seu profissional de saúde.
             """
             

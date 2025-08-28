@@ -7,8 +7,7 @@ from app.utils.decorators import profissional_required
 bp = Blueprint('profissional', __name__,url_prefix="/profissional")
 CORS(bp)
 @bp.route('/profissionais')
-@login_required
-@profissional_required
+
 def listar_profissionais():
     """
     Lista todos os profissionais (apenas para profissionais)
@@ -47,8 +46,6 @@ def meu_perfil():
         return redirect(url_for('diario.listar_diario'))
 
 @bp.route('/profissional/editar', methods=['GET', 'POST'])
-@login_required
-@profissional_required
 def editar_perfil():
     """
     Edita o perfil do profissional logado
@@ -77,8 +74,7 @@ def editar_perfil():
         return redirect(url_for('profissional.meu_perfil'))
 
 @bp.route('/profissional/<int:profissional_id>')
-@login_required
-@profissional_required
+
 def ver_profissional(profissional_id):
     """
     Visualiza detalhes de um profissional específico

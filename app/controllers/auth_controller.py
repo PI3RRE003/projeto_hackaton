@@ -24,17 +24,24 @@ def login_api():
 
     username = data.get("username")
     password = data.get("password")
+    user_type = data.get("user_type", "paciente")  # Padrão para paciente
+    
     if not username or not password:
         return jsonify({"error": "username e password são obrigatórios"}), 400
 
-    # Primeiro profissional, depois paciente
-    user = Profissional.query.filter_by(username=username).first()
-    if not user:
+    # Busca o usuário conforme o tipo especificado
+    if user_type == "profissional":
+        user = Profissional.query.filter_by(username=username).first()
+    else:
         user = Paciente.query.filter_by(username=username).first()
 
     if user and user.check_password(password):
         login_user(user)
         tipo = "profissional" if isinstance(user, Profissional) else "paciente"
-        return jsonify({"success": True,"message":"Login realizado com sucesso", "user_id": user.id, "tipo": tipo}), 200
+        return jsonify({
+            "success": True, 
+            "user_id": user.id, 
+            "tipo": tipo
+        }), 200
     else:
         return jsonify({"error": "Credenciais inválidas"}), 401

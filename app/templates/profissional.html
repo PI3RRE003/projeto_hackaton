@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Profissional - Evolv Mind</title>
+
+    <link="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+        <style>
+            /* Estilos existentes (sem alterações) */
+            body {
+                margin: 0;
+                font-family: 'Nunito', sans-serif;
+                background-color: #f9fafb;
+                color: #333;
+            }
+
+            .main-header {
+                background-color: white;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                padding: 15px 30px;
+                height: 70px;
+                box-sizing: border-box;
+            }
+
+            .header-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .logo {
+                font-size: 24px;
+                color: #4f46e5;
+                margin-left: 30px;
+            }
+
+            .logout-button {
+                background-color: transparent;
+                color: #4f46e5;
+                border: 1px solid #4f46e5;
+                padding: 8px 16px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 700;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .logout-button:hover {
+                background-color: #4f46e5;
+                color: white;
+            }
+
+            .professional-dashboard {
+                display: flex;
+                height: calc(100vh - 70px);
+            }
+
+            .patient-list-sidebar {
+                width: 280px;
+                background-color: #ffffff;
+                border-right: 1px solid #e5e7eb;
+                padding: 20px;
+                overflow-y: auto;
+                box-sizing: border-box;
+            }
+
+            .patient-list-sidebar h3 {
+                font-size: 1.1rem;
+                color: #374151;
+                margin-top: 0;
+            }
+
+            .patient-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .patient-item a {
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                border-radius: 8px;
+                text-decoration: none;
+                color: #4b5563;
+                font-weight: 500;
+                margin-bottom: 5px;
+                transition: background-color 0.2s;
+                cursor: pointer;
+            }
+
+            /* Adicione este CSS para corrigir a quebra de texto */
+
+            .patient-item a {
+                /* Garante que o link use todo o espaço disponível */
+                width: 100%;
+                box-sizing: border-box;
+                /* Inclui o padding no cálculo da largura */
+            }
+
+            .patient-item span {
+                /* Essencial: Permite que o texto quebre a linha */
+                white-space: normal;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                /* Suporte para navegadores mais antigos */
+                word-break: break-word;
+
+                /* Truque de Flexbox que permite ao item encolher se necessário */
+                min-width: 0;
+            }
+
+            .patient-item a:hover {
+                background-color: #f3f4f6;
+            }
+
+            .patient-item.active a {
+                background-color: #eef2ff;
+                color: #4f46e5;
+            }
+
+            .add-patient {
+                margin-top: 15px;
+            }
+
+            .avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin-right: 12px;
+                object-fit: cover;
+            }
+
+            .main-content {
+                flex-grow: 1;
+                padding: 30px;
+                overflow-y: auto;
+            }
+
+            .content-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .content-header h1 {
+                font-size: 1.8rem;
+                color: #111827;
+                margin: 0;
+            }
+
+            .date-selector input {
+                padding: 8px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-family: inherit;
+            }
+
+            .ai-summary-card {
+                background-color: #eef2ff;
+                border-left: 4px solid #4f46e5;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 30px;
+            }
+
+            .ai-summary-card h4 {
+                margin: 0 0 10px 0;
+                color: #3730a3;
+            }
+
+            .ai-summary-card p {
+                margin: 0;
+            }
+
+            /* --- NOVOS ESTILOS PARA A TABELA --- */
+            .table-container {
+                background-color: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                padding: 0;
+                overflow: hidden;
+                /* Para arredondar as bordas da tabela */
+            }
+
+            .messages-table {
+                width: 100%;
+                border-collapse: collapse;
+                /* Remove espaço entre as células */
+            }
+
+            .messages-table th,
+            .messages-table td {
+                padding: 12px 16px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .messages-table th {
+                background-color: #f9fafb;
+                color: #374151;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+            }
+
+            .messages-table td {
+                color: #4b5563;
+            }
+
+            .messages-table tbody tr:last-child td {
+                border-bottom: none;
+                /* Remove a borda da última linha */
+            }
+
+            .no-data-row td {
+                text-align: center;
+                color: #9ca3af;
+                padding: 40px;
+                font-style: italic;
+            }
+
+            /* --- CSS PARA DEIXAR A TABELA RESPONSIVA --- */
+
+            @media (max-width: 768px) {
+                .messages-table thead {
+                    /* 1. Esconde o cabeçalho original em telas pequenas */
+                    display: none;
+                }
+
+                .messages-table tr {
+                    /* 2. Faz cada linha parecer um "card" */
+                    display: block;
+                    margin-bottom: 15px;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                }
+
+                .messages-table td {
+                    /* 3. Empilha as células verticalmente */
+                    display: block;
+                    text-align: right;
+                    /* Alinha o conteúdo à direita */
+                    font-size: 0.9rem;
+                    border-bottom: 1px dotted #ccc;
+                }
+
+                .messages-table td:last-child {
+                    border-bottom: none;
+                }
+
+                .messages-table td::before {
+                    /* 4. Adiciona o texto do cabeçalho antes do conteúdo de cada célula */
+                    content: attr(data-label);
+                    /* Pega o texto do atributo 'data-label' */
+                    float: left;
+                    /* Alinha o cabeçalho à esquerda */
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+            }
+
+            .patient-list-sidebar {
+                width: 280px;
+                /* Garante uma largura fixa */
+                flex-shrink: 0;
+                /* A REGRA MAIS IMPORTANTE: Impede que a sidebar encolha */
+            }
+
+            .main-content {
+                flex-grow: 1;
+                /* Permite que o conteúdo principal cresça para preencher o espaço */
+                overflow-x: auto;
+                /* Adiciona uma barra de rolagem horizontal APENAS AQUI se a tabela for muito larga */
+                min-width: 0;
+                /* Garante o comportamento correto do flexbox em todas as situações */
+            }
+
+            /* BÔNUS: Garante que o texto dentro da sidebar não fique espremido e quebre a linha corretamente */
+            .patient-item span {
+                white-space: normal;
+                overflow-wrap: break-word;
+                word-break: break-word;
+            }
+        </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1 class="logo">Evolve Mind</h1>
+            <a href="index.html" class="logout-button">Sair</a>
+        </div>
+    </header>
+
+    <div class="professional-dashboard">
+        <aside class="patient-list-sidebar">
+            <h3>Meus Pacientes</h3>
+            <ul id="patient-list" class="patient-list"></ul>
+            <div class="patient-item add-patient">
+                <a href="#">+ Adicionar Paciente</a>
+            </div>
+        </aside>
+
+        <section class="main-content">
+            <div class="content-header">
+                <h1 id="patient-name">Jornada de...</h1>
+            </div>
+
+            <div class="ai-summary-card">
+                <h4>Síntese do Dia </h4>
+                <p id="ai-summary">Selecione um paciente para fazer análise.</p>
+            </div>
+
+            <div class="table-container">
+                <table class="messages-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Mensagem do Paciente</th>
+                            <th>Sua Resposta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mensagens-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // --- ESTADO DA APLICAÇÃO ---
+            let listaDePacientesCache = [];
+            let pacienteSelecionadoId = null;
+
+            // --- ELEMENTOS DO DOM ---
+            const patientListElement = document.getElementById('patient-list');
+            const patientNameElement = document.getElementById('patient-name');
+            const aiSummaryElement = document.getElementById('ai-summary');
+            const mensagensTableBody = document.getElementById('mensagens-table-body'); // Novo elemento
+
+            // --- FUNÇÕES DE API (Comunicação com o Back-end) ---
+            async function fetchPacientes() {
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/api/pacientes', { credentials: 'include' });
+                    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                    const pacientes = await response.json();
+                    listaDePacientesCache = pacientes;
+                    return pacientes;
+                } catch (error) {
+                    console.error("Falha ao buscar pacientes:", error);
+                    return [];
+                }
+            }
+
+            async function fetchMensagens(pacienteId) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:5000/api/pacientes/${pacienteId}/mensagens`, { credentials: 'include' });
+                    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error("Falha ao buscar mensagens:", error);
+                    return [];
+                }
+            }
+
+            // --- FUNÇÕES DE RENDERIZAÇÃO (Atualização da Tela) ---
+            function renderizarListaPacientes(pacientes) {
+                patientListElement.innerHTML = '';
+                pacientes.forEach(paciente => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'patient-item';
+                    listItem.dataset.patientId = paciente.id;
+                    listItem.innerHTML = `
+                        <a>
+                            <img src="${paciente.avatar_url || 'https://i.pravatar.cc/80'}" alt="Avatar" class="avatar">
+                            <span>${paciente.nome}</span>
+                        </a>
+                    `;
+                    patientListElement.appendChild(listItem);
+                });
+            }
+
+            // ===== FUNÇÃO ATUALIZADA PARA RENDERIZAR A TABELA =====
+            function renderizarTabelaDeMensagens(mensagens) {
+                mensagensTableBody.innerHTML = '';
+
+                if (!mensagens || mensagens.length === 0) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'no-data-row';
+                    tr.innerHTML = `<td colspan="3">Nenhuma mensagem encontrada para este paciente.</td>`;
+                    mensagensTableBody.appendChild(tr);
+                    return;
+                }
+
+                const mensagensDoPaciente = mensagens.filter(msg => msg.enviadoPeloPaciente);
+
+                mensagensDoPaciente.forEach(msg => {
+                    const tr = document.createElement('tr');
+
+                    const dataFormatada = new Date(msg.timestamp).toLocaleDateString('pt-BR', {
+                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    // --- AJUSTE AQUI: ADICIONE O ATRIBUTO 'data-label' ---
+
+                    const tdData = document.createElement('td');
+                    tdData.setAttribute('data-label', 'Data'); // Atributo para o CSS
+                    tdData.textContent = dataFormatada;
+
+                    const tdMensagem = document.createElement('td');
+                    tdMensagem.setAttribute('data-label', 'Mensagem'); // Atributo para o CSS
+                    tdMensagem.textContent = msg.mensagem;
+
+                    const tdResposta = document.createElement('td');
+                    tdResposta.setAttribute('data-label', 'Resposta'); // Atributo para o CSS
+                    tdResposta.textContent = msg.resposta || 'Aguardando resposta...';
+
+                    tr.appendChild(tdData);
+                    tr.appendChild(tdMensagem);
+                    tr.appendChild(tdResposta);
+                    mensagensTableBody.appendChild(tr);
+                });
+            }
+
+            function atualizarPacienteAtivoNaLista() {
+                document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('active'));
+                const itemAtivo = document.querySelector(`.patient-item[data-patient-id='${pacienteSelecionadoId}']`);
+                if (itemAtivo) itemAtivo.classList.add('active');
+            }
+
+            // --- EVENTOS E INICIALIZAÇÃO ---
+            async function carregarDadosDoPaciente() {
+                if (!pacienteSelecionadoId) return;
+
+                const paciente = listaDePacientesCache.find(p => p.id === pacienteSelecionadoId);
+                if (paciente) patientNameElement.textContent = `Jornada de ${paciente.nome}`;
+
+                // Limpa os dados antigos
+                mensagensTableBody.innerHTML = '';
+                aiSummaryElement.textContent = 'Carregando...';
+
+                // Busca e renderiza os novos dados
+                const mensagens = await fetchMensagens(pacienteSelecionadoId);
+                renderizarTabelaDeMensagens(mensagens);
+                // (Aqui você pode adicionar uma chamada para uma API de síntese, se tiver uma)
+                aiSummaryElement.textContent = `Analise as ${mensagens.length} mensagem(ns) do paciente.`;
+            }
+
+            patientListElement.addEventListener('click', async function (event) {
+                const itemClicado = event.target.closest('.patient-item');
+                if (itemClicado && itemClicado.dataset.patientId) {
+                    const novoId = parseInt(itemClicado.dataset.patientId);
+                    if (novoId !== pacienteSelecionadoId) {
+                        pacienteSelecionadoId = novoId;
+                        atualizarPacienteAtivoNaLista();
+                        await carregarDadosDoPaciente();
+                    }
+                }
+            });
+
+            async function inicializarPainel() {
+                const pacientes = await fetchPacientes();
+                if (pacientes.length > 0) {
+                    renderizarListaPacientes(pacientes);
+                    pacienteSelecionadoId = pacientes[0].id;
+                    atualizarPacienteAtivoNaLista();
+                    await carregarDadosDoPaciente();
+                } else {
+                    patientNameElement.textContent = "Nenhum paciente cadastrado";
+                }
+            }
+            function configurarBotaoDeCadastro() {
+                // 1. Encontra o botão de adicionar paciente pelo ID que definimos
+                const botaoAdicionarPaciente = document.getElementById('add-patient-btn');
+
+                // 2. Verifica se o botão realmente existe na página antes de continuar
+                if (botaoAdicionarPaciente) {
+
+                    // 3. Adiciona um "ouvinte" de evento de clique ao botão
+                    botaoAdicionarPaciente.addEventListener('click', () => {
+
+                        // 4. Quando o botão for clicado, redireciona o navegador para a página de cadastro
+                        console.log("Redirecionando para a página de cadastro...");
+                        window.location.href = 'cadastrar_paciente.html';
+                    });
+                }
+            }
+
+
+            configurarBotaoDeCadastro();
+            inicializarPainel();
+        });
+    </script>
+</body>
+
+</html>
