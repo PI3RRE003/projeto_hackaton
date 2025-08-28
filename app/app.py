@@ -8,7 +8,7 @@ import click
 
 def create_app():
     app = Flask(__name__)  
-    CORS(app)  
+    CORS(app,supports_credentials=True,origins=["http://127.0.0.1:5500"])  
     app.config.from_object(Config)
     
     # Inicializar extensões

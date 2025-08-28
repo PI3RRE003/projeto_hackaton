@@ -184,3 +184,27 @@ def dashboard():
     except Exception as e:
         flash('Erro ao carregar dashboard', 'error')
         return redirect(url_for('diario.listar_diario'))
+
+
+
+
+from app.models.paciente import Paciente
+from app.models.chat import MensagemChat
+@bp.route('/api/mensagens/<int:paciente_id>', methods=['GET'])
+def profissional_ver_mensagens(paciente_id):
+    # opcional: verificar se o profissional atende esse paciente
+    paciente = Paciente.query.get(paciente_id)
+    if not paciente:
+        return jsonify({"error": "Paciente não encontrado"}), 404
+
+    mensagens = MensagemChat.query.filter_by(paciente_id=paciente_id).order_by(MensagemChat.timestamp.asc()).all()
+    resultado = [
+        {
+            "id": msg.id,
+            "conteudo": msg.conteudo,
+            "timestamp": msg.timestamp.isoformat()
+        }
+        for msg in mensagens
+    ]
+
+    return jsonify({"mensagens": resultado}), 200

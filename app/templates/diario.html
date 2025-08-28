@@ -184,7 +184,7 @@
 <body>
     <header class="main-header">
         <div class="header-content">
-            <h1 class="logo">Evolve - Seu espaço pessoal</h1>
+            <h1 class="logo">Evolve Mind - Seu espaço pessoal</h1>
             <button id="logoutButton" class="logout-button">Sair</button>
         </div>
     </header>
@@ -192,21 +192,21 @@
         <div class="journal-card">
             <h2>Minha Jornada de Hoje</h2>
             <p id="currentDate">Carregando data...</p>
-            <div class="journal-entry" id="entryManha">
+            <div class="journal-entry" id="entryManha" data-periodo="manha">
                 <h3>☀️ Manhã</h3>
                 <textarea class="journal-textarea" placeholder="Como você está se sentindo hoje?"></textarea>
                 <button class="save-button">Salvar Relato</button>
                 <p class="feedback-message"></p>
                 <div class="dialog-box-container"></div>
             </div>
-            <div class="journal-entry" id="entryTarde">
+            <div class="journal-entry" id="entryTarde" data-periodo="tarde">
                 <h3>☀️ Tarde</h3>
                 <textarea class="journal-textarea" placeholder="O que aconteceu durante a sua tarde?"></textarea>
                 <button class="save-button">Salvar Relato</button>
                 <p class="feedback-message"></p>
                 <div class="dialog-box-container"></div>
             </div>
-            <div class="journal-entry" id="entryNoite">
+            <div class="journal-entry" id="entryNoite" data-periodo="noite">
                 <h3>🌙 Noite</h3>
                 <textarea class="journal-textarea" placeholder="Como você está terminando o seu dia?"></textarea>
                 <button class="save-button">Salvar Relato</button>
@@ -215,42 +215,59 @@
             </div>
         </div>
     </main>
+
     <script>
-        // Função para realizar requisições HTTP
-        async function fazerRequisicao(url, dados) {
-            try {
-                console.log(`Enviando para ${url}:`, dados);
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(dados)
-                });
-                console.log(`Status da resposta para ${url}:`, response.status);
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(`Erro na API: ${response.status} - ${errorData.error || response.statusText}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error(`Falha ao comunicar com ${url}:`, error.message, error.stack);
-                throw error;
-            }
+        const STORAGE_KEY = "jornadaDiaria";
+
+        // ---- Persistência Local ----
+        function salvarNoLocalStorage(periodo, relato, resposta) {
+            let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            dados[periodo] = { relato, resposta };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         }
 
-        // Função para obter direcionamento da IA
+        function carregarDoLocalStorage() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        }
+
+        function restaurarRelatos() {
+            const dados = carregarDoLocalStorage();
+            Object.keys(dados).forEach(periodo => {
+                const entry = document.querySelector(`[data-periodo="${periodo}"]`);
+                if (entry) {
+                    const textarea = entry.querySelector('.journal-textarea');
+                    const dialogContainer = entry.querySelector('.dialog-box-container');
+                    textarea.value = dados[periodo].relato;
+                    textarea.disabled = true;
+                    mostrarDialogo(dialogContainer, dados[periodo].resposta);
+                    const button = entry.querySelector('.save-button');
+                    button.disabled = true;
+                    button.textContent = 'Salvo!';
+                }
+            });
+        }
+
+        // ---- Funções auxiliares ----
         async function obterDirecionamentoDaIA(texto) {
             try {
-                const dados = { message: texto };
-                const resposta = await fazerRequisicao('http://127.0.0.1:5000/api/chat', dados);
-                return resposta.direcionamento || 'Resposta recebida, mas sem direcionamento.';
+                const dados = {
+                    message: texto,
+                    paciente_id: 1,
+                    profissional_id: 1
+                };
+                // 🔹 Aqui você pode manter a chamada real
+                const resposta = await fetch("http://127.0.0.1:5000/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                }).then(r => r.json());
+
+                return resposta.direcionamento || "Resposta recebida, mas sem direcionamento.";
             } catch (error) {
                 return `Erro ao obter direcionamento: ${error.message}`;
             }
         }
 
-        // Função para atualizar a data e hora
         function atualizarHorario() {
             const dateElement = document.getElementById('currentDate');
             const now = new Date();
@@ -260,7 +277,6 @@
             dateElement.textContent = `${dataFormatada} | ${horaFormatada}`;
         }
 
-        // Função para exibir mensagem de feedback
         function mostrarFeedback(container, mensagem, isErro = false) {
             const feedback = container.querySelector('.feedback-message');
             feedback.textContent = mensagem;
@@ -271,7 +287,6 @@
             }, 3000);
         }
 
-        // Função para criar e exibir caixa de diálogo
         function mostrarDialogo(container, mensagem) {
             container.innerHTML = '';
             const dialogBox = document.createElement('div');
@@ -281,26 +296,22 @@
             setTimeout(() => dialogBox.classList.add('visible'), 10);
         }
 
-        // Inicialização
+        // ---- Inicialização ----
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Página carregada!');
-
-            // Atualizar data e hora
             atualizarHorario();
             setInterval(atualizarHorario, 1000);
 
-            // Botão de logout
-            const logoutButton = document.getElementById('logoutButton');
-            logoutButton.addEventListener('click', () => {
-                console.log('Logout clicado');
+            restaurarRelatos();
+
+            document.getElementById('logoutButton').addEventListener('click', () => {
                 window.location.href = 'index.html';
             });
 
-            // Configurar botões de salvar
             const saveButtons = document.querySelectorAll('.save-button');
             saveButtons.forEach(button => {
                 button.addEventListener('click', async () => {
                     const parentEntry = button.closest('.journal-entry');
+                    const periodo = parentEntry.getAttribute("data-periodo");
                     const textarea = parentEntry.querySelector('.journal-textarea');
                     const dialogContainer = parentEntry.querySelector('.dialog-box-container');
                     const relato = textarea.value.trim();
@@ -319,6 +330,9 @@
                         mostrarFeedback(parentEntry, 'Relato salvo com sucesso!');
                         textarea.disabled = true;
                         button.textContent = 'Salvo!';
+
+                        // 🔹 Salvar no localStorage
+                        salvarNoLocalStorage(periodo, relato, respostaInteligente);
                     } catch (error) {
                         mostrarFeedback(parentEntry, `Erro: ${error.message}`, true);
                         button.disabled = false;

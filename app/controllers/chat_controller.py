@@ -3,8 +3,9 @@ from flask_login import login_required, current_user, login_manager
 from flask_socketio import emit, join_room
 from app.services.gemini_service import GeminiService
 from app.utils.decorators import paciente_required, profissional_required
-from datetime import date
-
+from datetime import date, datetime
+from app.models import MensagemChat, profissional
+from app.extensions import db
 bp = Blueprint('chat', __name__)
 gemini_service = GeminiService()
 '''
@@ -150,30 +151,43 @@ def chat_status():
 def chat_post():
     try:
         data = request.get_json()
+        paciente_id = data.get('paciente_id')
+        profissional_id = data.get('profissional_id')
+
         if not data:
             return jsonify({"error": "Nenhum dado enviado no corpo da requisição"}), 400
 
         message = data.get('message', '').strip()
         if not message:
-            return jsonify({"error": "O campo 'message' é obrigatório e não pode estar vazio"}), 400
+            return jsonify({"error": "O campo 'message' é obrigatório"}), 400
 
         # Integra com GPTService
-        try:
-            from app.services.gemini_service import GeminiService
-            gpt_service = GeminiService()
-            resposta_gpt = gpt_service.gerar_resposta(message)
-            return jsonify({
-                "status": "success",
-                "direcionamento": resposta_gpt
-            }), 200
-        except Exception as e:
-            return jsonify({"error": f"Erro ao processar a mensagem com GPTService: {str(e)}"}), 500
+        from app.services.gemini_service import GeminiService
+        gpt_service = GeminiService()
+        resposta_gpt = gpt_service.gerar_resposta(message)
+
+        # 🔹 salva no banco mensagem + resposta
+        nova_mensagem = MensagemChat(
+            paciente_id=paciente_id,
+            profissional_id=profissional_id,
+            mensagem=message,
+            resposta=resposta_gpt,
+            eh_do_paciente=True,
+            data=datetime.today().date(),
+            created_at=datetime.utcnow()
+        )
+
+        db.session.add(nova_mensagem)
+        db.session.commit()
+
+        return jsonify({
+            "status": "success",
+            "direcionamento": resposta_gpt
+        }), 200
 
     except Exception as e:
-        return jsonify({"error": f"Erro interno no servidor: {str(e)}"}), 500    # Retorna direto a resposta
-    '''
-    return jsonify({
-        "user_message": mensagem,
-        "assistant_response": resposta_gpt
-    }), 200
-    '''
+        return jsonify({"error": f"Erro interno no servidor: {str(e)}"}), 500
+        
+        
+        
+        

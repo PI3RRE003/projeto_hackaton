@@ -2,6 +2,7 @@ from app.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from app.models.associations import profissional_paciente
 
 class Profissional(db.Model, UserMixin):
     __tablename__ = "profissional"
@@ -15,6 +16,12 @@ class Profissional(db.Model, UserMixin):
         back_populates='profissional',
         lazy=True,
         cascade="all, delete-orphan"
+    )
+
+    pacientes = db.relationship(
+        'Paciente',
+        secondary=profissional_paciente,
+        back_populates="profissionais"
     )
 
     def set_password(self, password):

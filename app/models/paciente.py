@@ -2,6 +2,7 @@ from app.extensions import db
 from flask_login import UserMixin, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
+from app.models.associations import profissional_paciente
 
 class Paciente(db.Model,UserMixin):#tudo que tem no model e mixin
     #colunas id(int), username(text), password(text)
@@ -17,9 +18,15 @@ class Paciente(db.Model,UserMixin):#tudo que tem no model e mixin
     back_populates='paciente',
     lazy=True,
     cascade="all, delete-orphan"
-)
+    )
 
+    profissionais = db.relationship(
+        'Profissional',
+        secondary=profissional_paciente,
+        back_populates="pacientes"
+    )
 
+    from app.extensions import db
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
